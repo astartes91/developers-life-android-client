@@ -1,19 +1,15 @@
 package me.bibliarij.developerslifeapplication.client
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
-import android.widget.Toast
 import com.fasterxml.jackson.databind.ObjectMapper
+import me.bibliarij.developerslifeapplication.MainActivity
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.jetbrains.anko.runOnUiThread
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import java.io.File
 
-class DevelopersLifeRestClient (private val context: Context, private val objectMapper: ObjectMapper) {
+class DevelopersLifeRestClient (private val context: MainActivity, private val objectMapper: ObjectMapper) {
 
     private val restRetrofitRestClient: DevelopersLifeRetrofitRestClient = buildRestClient()
 
@@ -35,7 +31,7 @@ class DevelopersLifeRestClient (private val context: Context, private val object
             .addInterceptor { chain ->
 
                 var request: Request = chain.request()
-                request = if (hasNetwork()){
+                request = if (context.hasNetwork()){
                     /*
                      *  If there is Internet, get the cache that was stored 5 seconds ago.
                      *  If the cache is older than 5 seconds, then discard it,
@@ -67,23 +63,5 @@ class DevelopersLifeRestClient (private val context: Context, private val object
             .build()
 
         return retrofit.create(DevelopersLifeRetrofitRestClient::class.java)
-    }
-
-    private fun hasNetwork(): Boolean {
-        val connectivityManager: ConnectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE)
-                as ConnectivityManager
-        val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-        val result: Boolean = activeNetwork != null && activeNetwork.isConnected
-
-        if(!result){
-            context.runOnUiThread {
-                Toast.makeText(
-                    context, "No Internet connection. Trying to use cache data if exists...", Toast.LENGTH_SHORT
-                )
-                    .show()
-            }
-        }
-
-        return result
     }
 }

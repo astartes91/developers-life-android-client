@@ -2,6 +2,8 @@ package me.bibliarij.developerslifeapplication
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -55,6 +57,28 @@ class MainActivity : AppCompatActivity() {
         editor.commit()
     }
 
+    fun hasNetwork(): Boolean {
+        val connectivityManager: ConnectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE)
+                as ConnectivityManager
+        val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
+        val result: Boolean = activeNetwork != null && activeNetwork.isConnected
+
+        if(!result){
+            runOnUiThread {
+
+                Glide.with(this)
+                    .load(R.drawable.error)
+                    .placeholder(R.drawable.loading)
+                    .error(R.drawable.error)
+                    .into(pictureImageView)
+
+                descriptionTextView.text = "Произошла ошибка при загрузке данных. Проверьте подключение к сети"
+            }
+        }
+
+        return result
+    }
+
     private fun showNextPost() {
         doAsync {
 
@@ -67,7 +91,9 @@ class MainActivity : AppCompatActivity() {
                 randomPost
             }
 
-            showPost(post)
+            if(post != null){
+                showPost(post)
+            }
         }
     }
 
@@ -76,20 +102,28 @@ class MainActivity : AppCompatActivity() {
             val newValue = counter.decrementAndGet()
             val post = getPost(newValue)
 
-            showPost(post)
+            if (post != null){
+                showPost(post)
+            }
         }
     }
 
-    private fun getPost(value: Int): Post {
+    private fun getPost(value: Int): Post? {
         val string = readString(value.toString())
 
-        return objectMapper.readValue(string, Post::class.java)
+        return if(string != null){
+            objectMapper.readValue(string, Post::class.java)
+        } else {
+            null
+        }
     }
 
     private fun showPost(randomPost: Post) {
         runOnUiThread {
             Glide.with(this)
                 .load(randomPost.gifURL)
+                .placeholder(R.drawable.loading)
+                .error(R.drawable.error)
                 .into(pictureImageView)
 
             descriptionTextView.text = randomPost.description
