@@ -4,9 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.widget.Toast
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -15,7 +13,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import java.io.File
 
-class DevelopersLifeRestClient (private val context: Context) {
+class DevelopersLifeRestClient (private val context: Context, private val objectMapper: ObjectMapper) {
 
     private val restRetrofitRestClient: DevelopersLifeRetrofitRestClient = buildRestClient()
 
@@ -62,13 +60,9 @@ class DevelopersLifeRestClient (private val context: Context) {
             }
             .build()
 
-        val jacksonMapper = ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .registerModule(KotlinModule())
-
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl("https://developerslife.ru")
-            .addConverterFactory(JacksonConverterFactory.create(jacksonMapper))
+            .addConverterFactory(JacksonConverterFactory.create(objectMapper))
             .client(okHttpClient)
             .build()
 
