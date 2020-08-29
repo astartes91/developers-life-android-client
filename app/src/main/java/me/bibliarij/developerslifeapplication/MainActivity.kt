@@ -33,9 +33,17 @@ class MainActivity : AppCompatActivity() {
         changePrevButtonState()
 
         nextButton.setOnClickListener {
-            counter.incrementAndGet()
-            showNextPost()
-            changePrevButtonState()
+            doAsync {
+
+                counter.incrementAndGet()
+                if(showNextPost()){
+                    runOnUiThread {
+                        changePrevButtonState()
+                    }
+                } else {
+                    counter.decrementAndGet()
+                }
+            }
         }
 
         previousButton.setOnClickListener {
@@ -46,7 +54,9 @@ class MainActivity : AppCompatActivity() {
 
         developersLifeRestClient = DevelopersLifeRestClient(this, objectMapper)
 
-        showNextPost()
+        doAsync {
+            showNextPost()
+        }
     }
 
     override fun onDestroy() {
@@ -63,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
         val result: Boolean = activeNetwork != null && activeNetwork.isConnected
 
-        if(!result){
+        if (!result) {
             runOnUiThread {
 
                 Glide.with(this)
@@ -79,22 +89,24 @@ class MainActivity : AppCompatActivity() {
         return result
     }
 
-    private fun showNextPost() {
-        doAsync {
-
-            val counterValue = counter.get()
-            val post = if(readString(counterValue.toString()) != null){
+    private fun showNextPost(): Boolean {
+        val counterValue = counter.get()
+        val post =
+            if (readString(counterValue.toString()) != null) {
                 getPost(counterValue)
             } else {
                 val randomPost = developersLifeRestClient.getRandomPost()
-                writeString(counterValue.toString(), objectMapper.writeValueAsString(randomPost))
+                if (randomPost != null) {
+                    writeString(counterValue.toString(), objectMapper.writeValueAsString(randomPost))
+                }
                 randomPost
             }
 
-            if(post != null){
-                showPost(post)
-            }
+        if (post != null) {
+            showPost(post)
         }
+
+        return post != null
     }
 
     private fun showPreviousPost() {
@@ -102,7 +114,7 @@ class MainActivity : AppCompatActivity() {
             val newValue = counter.decrementAndGet()
             val post = getPost(newValue)
 
-            if (post != null){
+            if (post != null) {
                 showPost(post)
             }
         }
@@ -111,7 +123,7 @@ class MainActivity : AppCompatActivity() {
     private fun getPost(value: Int): Post? {
         val string = readString(value.toString())
 
-        return if(string != null){
+        return if (string != null) {
             objectMapper.readValue(string, Post::class.java)
         } else {
             null

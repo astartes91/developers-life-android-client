@@ -13,11 +13,11 @@ class DevelopersLifeRestClient (private val context: MainActivity, private val o
 
     private val restRetrofitRestClient: DevelopersLifeRetrofitRestClient = buildRestClient()
 
-    fun getRandomPost(): Post {
+    fun getRandomPost(): Post? {
 
         val body: Post? = restRetrofitRestClient.getRandomPost().execute().body()
 
-        return body!!
+        return body
     }
 
     private fun buildRestClient(): DevelopersLifeRetrofitRestClient {

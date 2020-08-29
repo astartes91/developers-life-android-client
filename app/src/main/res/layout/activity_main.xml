@@ -13,13 +13,15 @@
             app:layout_constraintBottom_toTopOf="@id/previousButton"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
+            android:foregroundGravity="top"
             android:id="@+id/descriptionTextView"/>
     <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent" app:layout_constraintBottom_toTopOf="@id/descriptionTextView"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" app:srcCompat="@drawable/ic_launcher_foreground" android:foregroundGravity="bottom"
+            app:layout_constraintRight_toRightOf="parent" app:srcCompat="@drawable/ic_launcher_foreground"
+            android:foregroundGravity="bottom"
             android:id="@+id/pictureImageView"/>
     <Button
             android:text="Назад"
