@@ -53,8 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        val editor: SharedPreferences.Editor =
-            getSharedPreferences(cacheName, Context.MODE_PRIVATE).edit()
+        val editor: SharedPreferences.Editor = getSharedPreferences(cacheName, Context.MODE_PRIVATE).edit()
         editor.clear()
         editor.commit()
     }
@@ -95,9 +94,8 @@ class MainActivity : AppCompatActivity() {
                     randomPost
                 }
 
-            if (post != null) {
-                showPost(post)
-            }
+
+            showPost(post)
         }
     }
 
@@ -106,9 +104,7 @@ class MainActivity : AppCompatActivity() {
             val newValue = counter.decrementAndGet()
             val post = getPost(newValue)
 
-            if (post != null) {
-                showPost(post)
-            }
+            showPost(post)
         }
     }
 
@@ -122,15 +118,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showPost(randomPost: Post) {
-        runOnUiThread {
-            Glide.with(this)
-                .load(randomPost.gifURL)
-                .placeholder(R.drawable.loading)
-                .error(R.drawable.error)
-                .into(pictureImageView)
+    private fun showPost(post: Post?) {
+        if (post != null) {
+            runOnUiThread {
+                Glide.with(this)
+                    .load(post.gifURL)
+                    .placeholder(R.drawable.loading)
+                    .error(R.drawable.error)
+                    .into(pictureImageView)
 
-            descriptionTextView.text = randomPost.description
+                descriptionTextView.text = post.description
+            }
         }
     }
 
