@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class MainActivity : AppCompatActivity() {
 
+    private val cacheName = "DEVELOPERS_LIFE_CLIENT_CACHE"
+
     private lateinit var developersLifeRestClient: DevelopersLifeRestClient
 
     private val objectMapper = ObjectMapper()
@@ -52,7 +54,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         val editor: SharedPreferences.Editor =
-            getSharedPreferences("DEVELOPERS_LIFE_CLIENT_CACHE", Context.MODE_PRIVATE).edit()
+            getSharedPreferences(cacheName, Context.MODE_PRIVATE).edit()
         editor.clear()
         editor.commit()
     }
@@ -133,15 +135,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun writeString(key: String, property: String) {
-        val editor: SharedPreferences.Editor =
-            getSharedPreferences("DEVELOPERS_LIFE_CLIENT_CACHE", Context.MODE_PRIVATE).edit()
+        val editor: SharedPreferences.Editor = getSharedPreferences(cacheName, Context.MODE_PRIVATE).edit()
         editor.putString(key, property)
         editor.commit()
     }
 
     private fun readString(key: String): String? {
-        return getSharedPreferences("DEVELOPERS_LIFE_CLIENT_CACHE", Context.MODE_PRIVATE)
-            .getString(key, null)
+        return getSharedPreferences(cacheName, Context.MODE_PRIVATE).getString(key, null)
     }
 
     private fun changePrevButtonState(): Unit {
