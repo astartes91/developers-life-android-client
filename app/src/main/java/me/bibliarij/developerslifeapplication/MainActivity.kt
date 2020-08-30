@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         doAsync {
             val post =
                 if (readString(counterValue.toString()) != null) {
-                    getPost(counterValue)
+                    getCachedPost(counterValue)
                 } else {
                     val randomPost = developersLifeRestClient.getRandomPost()
                     if (randomPost != null) {
@@ -102,13 +102,13 @@ class MainActivity : AppCompatActivity() {
     private fun showPreviousPost() {
         if (counter.get() > 0) {
             val newValue = counter.decrementAndGet()
-            val post = getPost(newValue)
+            val post = getCachedPost(newValue)
 
             showPost(post)
         }
     }
 
-    private fun getPost(value: Int): Post? {
+    private fun getCachedPost(value: Int): Post? {
         val string = readString(value.toString())
 
         return if (string != null) {
@@ -120,14 +120,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun showPost(post: Post?) {
         if (post != null) {
+            val (description, gifURL) = post
             runOnUiThread {
                 Glide.with(this)
-                    .load(post.gifURL)
+                    .load(gifURL)
                     .placeholder(R.drawable.loading)
                     .error(R.drawable.error)
                     .into(pictureImageView)
 
-                descriptionTextView.text = post.description
+                descriptionTextView.text = description
             }
         }
     }
