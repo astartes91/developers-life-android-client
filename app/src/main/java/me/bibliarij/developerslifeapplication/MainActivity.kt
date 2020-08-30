@@ -33,17 +33,9 @@ class MainActivity : AppCompatActivity() {
         changePrevButtonState()
 
         nextButton.setOnClickListener {
-            doAsync {
-
-                counter.incrementAndGet()
-                if(showNextPost()){
-                    runOnUiThread {
-                        changePrevButtonState()
-                    }
-                } else {
-                    counter.decrementAndGet()
-                }
-            }
+            counter.incrementAndGet()
+            showNextPost()
+            changePrevButtonState()
         }
 
         previousButton.setOnClickListener {
@@ -54,9 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         developersLifeRestClient = DevelopersLifeRestClient(this, objectMapper)
 
-        doAsync {
-            showNextPost()
-        }
+        showNextPost()
     }
 
     override fun onDestroy() {
@@ -89,24 +79,24 @@ class MainActivity : AppCompatActivity() {
         return result
     }
 
-    private fun showNextPost(): Boolean {
+    private fun showNextPost() {
         val counterValue = counter.get()
-        val post =
-            if (readString(counterValue.toString()) != null) {
-                getPost(counterValue)
-            } else {
-                val randomPost = developersLifeRestClient.getRandomPost()
-                if (randomPost != null) {
-                    writeString(counterValue.toString(), objectMapper.writeValueAsString(randomPost))
+        doAsync {
+            val post =
+                if (readString(counterValue.toString()) != null) {
+                    getPost(counterValue)
+                } else {
+                    val randomPost = developersLifeRestClient.getRandomPost()
+                    if (randomPost != null) {
+                        writeString(counterValue.toString(), objectMapper.writeValueAsString(randomPost))
+                    }
+                    randomPost
                 }
-                randomPost
+
+            if (post != null) {
+                showPost(post)
             }
-
-        if (post != null) {
-            showPost(post)
         }
-
-        return post != null
     }
 
     private fun showPreviousPost() {
