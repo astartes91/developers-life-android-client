@@ -1,1 +1,1 @@
-# nizamutdinov
+# developers-life-android-client
